@@ -16,6 +16,8 @@ BGR_B_LOWER = (125, 112, 66)
 BGR_B_UPPER = (210, 112, 66)
 BGR_Y_LOWER = (0, 255, 254)
 BGR_Y_UPPER = (40, 255, 254)
+BGR_R_LOWER = (2, 15, 215)
+BGR_R_UPPER = (2, 15, 250)
 
 
 def create_canvas(h, w, c):
@@ -35,7 +37,8 @@ def random_color(bgr_lower, bgr_upper, index):
 
 
 def roi_fill_color(img, roi, color):
-    img[roi[0][1]:roi[1][1], roi[0][0]:roi[1][0]] = color
+    if roi:
+        img[roi[0][1]:roi[1][1], roi[0][0]:roi[1][0]] = color
 
 
 def draw_v_lines(img, h_step_min, h_step_max, end_dist_thresh, color, thickness):
@@ -112,11 +115,27 @@ def roi_top_left(img, v_lines, h_lines, thickness):
                 break
         if pt2:
             break
-    return (pt1, pt2)
+    return (pt1, pt2) if pt1 and pt2 else None
 
 
-def roi_center_right(img, v_lines, h_lines):
-    pass
+def roi_center_right(img, v_lines, h_lines, thickness):
+    h_canvas, w_canvas, _ = img.shape
+    pt1, pt2 = None, None
+    c_canvas = int(h_canvas / 2)
+
+    for h_lines_at_v_step in h_lines:
+        lines, h = h_lines_at_v_step[0], h_lines_at_v_step[1]
+        for h_line_at_v_step in lines[::-1]:
+            h_line_start, h_line_end = h_line_at_v_step[0], h_line_at_v_step[1]
+            if h_line_end == w_canvas and h < c_canvas:
+                pt1 = (int(h_line_start + thickness - 1), (h + thickness - 1))
+            if h_line_end == w_canvas and h > c_canvas:
+                pt2 = (int(w_canvas), int(h - thickness / 2))
+                break
+        if pt2:
+            break
+
+    return (pt1, pt2) if pt1 and pt2 else None
 
 
 def roi_bottom_right(img, v_lines, h_lines, thickness):
@@ -133,11 +152,7 @@ def roi_bottom_right(img, v_lines, h_lines, thickness):
                 break
         if pt2:
             break
-    return (pt1, pt2)
-
-
-def roi_center_left(img, v_lines, h_lines):
-    pass
+    return (pt1, pt2) if pt1 and pt2 else None
 
 
 img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 255)
@@ -145,18 +160,16 @@ img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 255)
 v_lines = draw_v_lines(img, H_STEP_MIN, H_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
 h_lines = draw_h_lines(img, v_lines, V_STEP_MIN, V_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
 
-
-# print(v_lines)
-# print(h_lines)
-# for asd in h_lines[::-1]:
-#     print(asd)
-
 roi = roi_top_left(img, v_lines, h_lines, LINE_THICKNESS)
 color = random_color(BGR_B_LOWER, BGR_B_UPPER, 0)
 roi_fill_color(img, roi, color)
 
 roi = roi_bottom_right(img, v_lines, h_lines, LINE_THICKNESS)
 color = random_color(BGR_Y_LOWER, BGR_Y_UPPER, 0)
+roi_fill_color(img, roi, color)
+
+roi = roi_center_right(img, v_lines, h_lines, LINE_THICKNESS)
+color = random_color(BGR_R_LOWER, BGR_R_UPPER, 2)
 roi_fill_color(img, roi, color)
 
 cv2.imshow('mondriaan', img)
