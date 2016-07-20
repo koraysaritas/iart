@@ -14,6 +14,8 @@ V_STEP_MIN = int(CANVAS_WIDTH * 0.1)
 V_STEP_MAX = int(CANVAS_WIDTH * 0.2)
 BGR_B_LOWER = (125, 112, 66)
 BGR_B_UPPER = (210, 112, 66)
+BGR_Y_LOWER = (0, 255, 254)
+BGR_Y_UPPER = (40, 255, 254)
 
 
 def create_canvas(h, w, c):
@@ -117,8 +119,21 @@ def roi_center_right(img, v_lines, h_lines):
     pass
 
 
-def roi_bottom_right(img, v_lines, h_lines):
-    pass
+def roi_bottom_right(img, v_lines, h_lines, thickness):
+    h_canvas, w_canvas, _ = img.shape
+    pt1 = None
+    pt2 = None
+    v_line_end = v_lines[-2]
+    for h_lines_at_v_step in h_lines[::-1]:
+        lines, h = h_lines_at_v_step[0], h_lines_at_v_step[1]
+        for h_line_at_v_step in lines:
+            if h_line_at_v_step[1] == v_line_end:
+                pt1 = (h_line_at_v_step[0] + thickness, h + thickness)
+                pt2 = (int(v_line_end - thickness / 2), int(h_canvas))
+                break
+        if pt2:
+            break
+    return (pt1, pt2)
 
 
 def roi_center_left(img, v_lines, h_lines):
@@ -130,12 +145,18 @@ img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 255)
 v_lines = draw_v_lines(img, H_STEP_MIN, H_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
 h_lines = draw_h_lines(img, v_lines, V_STEP_MIN, V_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
 
+
 # print(v_lines)
 # print(h_lines)
-# print()
+# for asd in h_lines[::-1]:
+#     print(asd)
 
 roi = roi_top_left(img, v_lines, h_lines, LINE_THICKNESS)
 color = random_color(BGR_B_LOWER, BGR_B_UPPER, 0)
+roi_fill_color(img, roi, color)
+
+roi = roi_bottom_right(img, v_lines, h_lines, LINE_THICKNESS)
+color = random_color(BGR_Y_LOWER, BGR_Y_UPPER, 0)
 roi_fill_color(img, roi, color)
 
 cv2.imshow('mondriaan', img)
