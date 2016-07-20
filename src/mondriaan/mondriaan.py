@@ -155,24 +155,25 @@ def roi_bottom_right(img, v_lines, h_lines, thickness):
     return (pt1, pt2) if pt1 and pt2 else None
 
 
-img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 255)
+if __name__ == '__main__':
+    img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 255)
 
-v_lines = draw_v_lines(img, H_STEP_MIN, H_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
-h_lines = draw_h_lines(img, v_lines, V_STEP_MIN, V_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
+    v_lines = draw_v_lines(img, H_STEP_MIN, H_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
+    h_lines = draw_h_lines(img, v_lines, V_STEP_MIN, V_STEP_MAX, END_DIST_THRESH, COLOR_BLACK_BGR, LINE_THICKNESS)
 
-roi = roi_top_left(img, v_lines, h_lines, LINE_THICKNESS)
-color = random_color(BGR_B_LOWER, BGR_B_UPPER, 0)
-roi_fill_color(img, roi, color)
+    roi = roi_top_left(img, v_lines, h_lines, LINE_THICKNESS)
+    color = random_color(BGR_B_LOWER, BGR_B_UPPER, 0)
+    roi_fill_color(img, roi, color)
 
-roi = roi_bottom_right(img, v_lines, h_lines, LINE_THICKNESS)
-color = random_color(BGR_Y_LOWER, BGR_Y_UPPER, 0)
-roi_fill_color(img, roi, color)
+    roi = roi_bottom_right(img, v_lines, h_lines, LINE_THICKNESS)
+    color = random_color(BGR_Y_LOWER, BGR_Y_UPPER, 0)
+    roi_fill_color(img, roi, color)
 
-roi = roi_center_right(img, v_lines, h_lines, LINE_THICKNESS)
-color = random_color(BGR_R_LOWER, BGR_R_UPPER, 2)
-roi_fill_color(img, roi, color)
+    roi = roi_center_right(img, v_lines, h_lines, LINE_THICKNESS)
+    color = random_color(BGR_R_LOWER, BGR_R_UPPER, 2)
+    roi_fill_color(img, roi, color)
 
-cv2.imshow('mondriaan', img)
-cv2.imwrite('mondriaan.png', img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    cv2.imshow('mondriaan', img)
+    cv2.imwrite('mondriaan.png', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
