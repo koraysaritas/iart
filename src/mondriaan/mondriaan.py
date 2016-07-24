@@ -38,7 +38,7 @@ def random_color(bgr_lower, bgr_upper, index):
 
 def roi_fill_color(img, roi, color):
     if roi:
-        img[roi[0][1]:roi[1][1], roi[0][0]:roi[1][0]] = color
+        img[roi[0][0]:roi[1][0], roi[0][1]:roi[1][1]] = color
 
 
 def draw_v_lines(img, h_step_min, h_step_max, end_dist_thresh, color, thickness):
@@ -111,7 +111,7 @@ def roi_top_left(img, v_lines, h_lines, thickness):
         lines, h = h_lines_at_v_step[0], h_lines_at_v_step[1]
         for h_line_at_v_step in lines:
             if h_line_at_v_step[1] == v_line_first:
-                pt2 = (int(v_line_first - thickness / 2), int(h - thickness / 2))
+                pt2 = (int(h - thickness / 2), int(v_line_first - thickness / 2))
                 break
         if pt2:
             break
@@ -128,9 +128,9 @@ def roi_center_right(img, v_lines, h_lines, thickness):
         for h_line_at_v_step in lines[::-1]:
             h_line_start, h_line_end = h_line_at_v_step[0], h_line_at_v_step[1]
             if h_line_end == w_canvas and h < c_canvas:
-                pt1 = (int(h_line_start + thickness - 1), (h + thickness - 1))
+                pt1 = ((h + thickness - 1), int(h_line_start + thickness - 1))
             if h_line_end == w_canvas and h > c_canvas:
-                pt2 = (int(w_canvas), int(h - thickness / 2))
+                pt2 = (int(h - thickness / 2), int(w_canvas))
                 break
         if pt2:
             break
@@ -147,8 +147,8 @@ def roi_bottom_right(img, v_lines, h_lines, thickness):
         lines, h = h_lines_at_v_step[0], h_lines_at_v_step[1]
         for h_line_at_v_step in lines:
             if h_line_at_v_step[1] == v_line_end:
-                pt1 = (h_line_at_v_step[0] + thickness, h + thickness)
-                pt2 = (int(v_line_end - thickness / 2), int(h_canvas))
+                pt1 = (h + thickness, h_line_at_v_step[0] + thickness)
+                pt2 = (int(h_canvas), int(v_line_end - thickness / 2))
                 break
         if pt2:
             break
