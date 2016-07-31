@@ -60,10 +60,11 @@ if __name__ == '__main__':
     for simplex in tri.simplices:
         ix1, ix2, ix3 = simplex
         pt1, pt2, pt3 = tuple(pts[ix1]), tuple(pts[ix2]), tuple(pts[ix3])
+        triangle = np.array([pt1, pt2, pt3], np.int32)
+        cv2.fillConvexPoly(img, triangle, BGR_B_UPPER)
         cv2.line(img, pt1, pt2, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
         cv2.line(img, pt2, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
         cv2.line(img, pt1, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
-
 
     cv2.imshow('korora_selina', img)
     cv2.imwrite('korora_selina.png', img)
