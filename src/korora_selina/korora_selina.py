@@ -44,6 +44,14 @@ def rand_pts(upper_bound, size):
     return np.random.choice(upper_bound, size=size)
 
 
+def gen_color(bgr_lower, bgr_upper, num):
+    arr_b = np.linspace(bgr_lower[0], bgr_upper[0], num)
+    arr_g = np.linspace(bgr_lower[1], bgr_upper[1], num)
+    arr_r = np.linspace(bgr_lower[2], bgr_upper[2], num)
+    for b, g, r in zip(arr_b, arr_g, arr_r):
+        yield (b, g, r)
+
+
 if __name__ == '__main__':
     img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 0)
 
@@ -57,11 +65,15 @@ if __name__ == '__main__':
 
     tri = Delaunay(pts)
 
+    gen_c = gen_color(BGR_R_LOWER, BGR_B_UPPER, CANVAS_WIDTH)
+    for ix in range(CANVAS_WIDTH):
+        cv2.line(img, (ix, 0), (ix, CANVAS_HEIGHT), next(gen_c), 1, lineType=cv2.LINE_AA)
+
     for simplex in tri.simplices:
         ix1, ix2, ix3 = simplex
         pt1, pt2, pt3 = tuple(pts[ix1]), tuple(pts[ix2]), tuple(pts[ix3])
-        triangle = np.array([pt1, pt2, pt3], np.int32)
-        cv2.fillConvexPoly(img, triangle, BGR_B_UPPER)
+        # triangle = np.array([pt1, pt2, pt3], np.int32)
+        # cv2.fillConvexPoly(img, triangle, BGR_B_UPPER)
         cv2.line(img, pt1, pt2, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
         cv2.line(img, pt2, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
         cv2.line(img, pt1, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
