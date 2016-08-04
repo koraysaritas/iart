@@ -2,81 +2,73 @@
 # https://github.com/kororaproject/kp-korora-backgrounds/blob/a91c0960a4d9266b9e6393fefd4337f5a48d64ca/upstream/default/wide/korora.png
 import numpy as np
 import cv2
-import random
+import math
 from scipy.spatial import Delaunay
-import pylab
 
-CANVAS_WIDTH = 512
-CANVAS_HEIGHT = 512
+CANVAS_WIDTH = 1920
+CANVAS_HEIGHT = 1080
+MAX_POINTS = 100
 LINE_THICKNESS = 1
 COLOR_BLACK_BGR = (0, 0, 0)
 COLOR_WHITE_BGR = (255, 255, 255)
-BGR_B_LOWER = (125, 112, 66)
-BGR_B_UPPER = (210, 112, 66)
-BGR_Y_LOWER = (0, 255, 254)
-BGR_Y_UPPER = (40, 255, 254)
-BGR_R_LOWER = (2, 15, 215)
-BGR_R_UPPER = (2, 15, 250)
+BGR_B = (237, 184, 20)
+BGR_Y = (116, 213, 251)
+BGR_R = (24, 27, 195)
 
 
 def create_canvas(h, w, c):
-    img = np.zeros((h, w, 3), np.uint8)  # h-w-d
+    img = np.zeros((h, w, 3), np.uint8)
     img.fill(c)
     return img
-
-
-def random_color(bgr_lower, bgr_upper, index):
-    c = np.array([0, 0, 0])
-    for i, (l, u) in enumerate(zip(bgr_lower, bgr_upper)):
-        if i == index:
-            c[i] = random.randint(bgr_lower[index], bgr_upper[index])
-        else:
-            c[i] = u
-    return c
-
-
-def roi_fill_color(img, roi, color):
-    if roi:
-        img[roi[0][0]:roi[1][0], roi[0][1]:roi[1][1]] = color
 
 
 def rand_pts(upper_bound, size):
     return np.random.choice(upper_bound, size=size)
 
 
-def gen_color(bgr_lower, bgr_upper, num):
-    arr_b = np.linspace(bgr_lower[0], bgr_upper[0], num)
-    arr_g = np.linspace(bgr_lower[1], bgr_upper[1], num)
-    arr_r = np.linspace(bgr_lower[2], bgr_upper[2], num)
-    for b, g, r in zip(arr_b, arr_g, arr_r):
-        yield (b, g, r)
+def gen_color(num, colors):
+    seq_num = math.ceil(num / len(colors))
+    colors.append(colors[0])
+    for f, t in zip(colors[:-1], colors[1:]):
+        arr_b = np.linspace(f[0], t[0], seq_num)
+        arr_g = np.linspace(f[1], t[1], seq_num)
+        arr_r = np.linspace(f[2], t[2], seq_num)
+        for b, g, r in zip(arr_b, arr_g, arr_r):
+            yield (b, g, r)
 
 
 if __name__ == '__main__':
     img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 0)
-
-    rand_pts_h = rand_pts(CANVAS_HEIGHT, 50)
-    rand_pts_w = rand_pts(CANVAS_WIDTH, 50)
+    range = max(CANVAS_HEIGHT, CANVAS_WIDTH)
+    rand_pts_h = rand_pts(range, 100)
+    rand_pts_w = rand_pts(range, 100)
 
     pts = np.stack((rand_pts_h, rand_pts_w), axis=1)
-    edge_pts = [[0, 0], [CANVAS_HEIGHT, 0], [0, CANVAS_WIDTH], [CANVAS_HEIGHT, CANVAS_WIDTH]]
+    edge_pts = [[0, 0], [0, CANVAS_HEIGHT], [CANVAS_WIDTH, 0], [CANVAS_HEIGHT, CANVAS_WIDTH]]
     pts = np.append(pts, edge_pts)
-    pts = np.reshape(pts, (54, 2))
+    pts = np.reshape(pts, (MAX_POINTS + len(edge_pts), 2))
 
     tri = Delaunay(pts)
 
-    gen_c = gen_color(BGR_R_LOWER, BGR_B_UPPER, CANVAS_WIDTH)
-    for ix in range(CANVAS_WIDTH):
-        cv2.line(img, (ix, 0), (ix, CANVAS_HEIGHT), next(gen_c), 1, lineType=cv2.LINE_AA)
-
-    for simplex in tri.simplices:
-        ix1, ix2, ix3 = simplex
-        pt1, pt2, pt3 = tuple(pts[ix1]), tuple(pts[ix2]), tuple(pts[ix3])
-        # triangle = np.array([pt1, pt2, pt3], np.int32)
-        # cv2.fillConvexPoly(img, triangle, BGR_B_UPPER)
-        cv2.line(img, pt1, pt2, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
-        cv2.line(img, pt2, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
-        cv2.line(img, pt1, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
+    gen_c = gen_color(len(tri.simplices), [BGR_B, BGR_Y, BGR_R])
+    ix = 0
+    visited = {}
+    queue = [(ix, tri.simplices[ix])]
+    while len(queue) > 0:
+        ix, simplex = queue.pop(0)
+        if ix not in visited:
+            visited[ix] = True
+            ix1, ix2, ix3 = simplex
+            pt1, pt2, pt3 = tuple(pts[ix1]), tuple(pts[ix2]), tuple(pts[ix3])
+            triangle = np.array([pt1, pt2, pt3])
+            cv2.fillConvexPoly(img, triangle, next(gen_c))
+            cv2.line(img, pt1, pt2, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
+            cv2.line(img, pt2, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
+            cv2.line(img, pt1, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
+            ns = tri.neighbors[ix]
+            for n in ns:
+                if n != -1:
+                    queue.append((n, tri.simplices[n]))
 
     cv2.imshow('korora_selina', img)
     cv2.imwrite('korora_selina.png', img)
