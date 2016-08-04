@@ -7,7 +7,7 @@ from scipy.spatial import Delaunay
 
 CANVAS_WIDTH = 1920
 CANVAS_HEIGHT = 1080
-MAX_POINTS = 100
+MAX_POINTS = 500
 LINE_THICKNESS = 1
 COLOR_BLACK_BGR = (0, 0, 0)
 COLOR_WHITE_BGR = (255, 255, 255)
@@ -40,8 +40,8 @@ def gen_color(num, colors):
 if __name__ == '__main__':
     img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 0)
     range = max(CANVAS_HEIGHT, CANVAS_WIDTH)
-    rand_pts_h = rand_pts(range, 100)
-    rand_pts_w = rand_pts(range, 100)
+    rand_pts_h = rand_pts(range, MAX_POINTS)
+    rand_pts_w = rand_pts(range, MAX_POINTS)
 
     pts = np.stack((rand_pts_h, rand_pts_w), axis=1)
     edge_pts = [[0, 0], [0, CANVAS_HEIGHT], [CANVAS_WIDTH, 0], [CANVAS_WIDTH, CANVAS_HEIGHT]]
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     tri = Delaunay(pts)
 
-    gen_c = gen_color(len(tri.simplices), [BGR_B, BGR_Y, BGR_R])
+    gen_c = gen_color(len(tri.simplices), [BGR_R, BGR_B, BGR_Y, BGR_R])
     ix = 0
     visited = {}
     queue = [(ix, tri.simplices[ix])]
@@ -65,10 +65,9 @@ if __name__ == '__main__':
             cv2.line(img, pt1, pt2, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
             cv2.line(img, pt2, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
             cv2.line(img, pt1, pt3, COLOR_WHITE_BGR, 2, lineType=cv2.LINE_AA)
-            ns = tri.neighbors[ix]
+            ns = [n for n in tri.neighbors[ix] if n != -1]
             for n in ns:
-                if n != -1:
-                    queue.append((n, tri.simplices[n]))
+                queue.append((n, tri.simplices[n]))
 
     cv2.imshow('korora_selina', img)
     cv2.imwrite('korora_selina.png', img)
