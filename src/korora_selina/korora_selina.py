@@ -44,7 +44,7 @@ if __name__ == '__main__':
     rand_pts_w = rand_pts(range, 100)
 
     pts = np.stack((rand_pts_h, rand_pts_w), axis=1)
-    edge_pts = [[0, 0], [0, CANVAS_HEIGHT], [CANVAS_WIDTH, 0], [CANVAS_HEIGHT, CANVAS_WIDTH]]
+    edge_pts = [[0, 0], [0, CANVAS_HEIGHT], [CANVAS_WIDTH, 0], [CANVAS_WIDTH, CANVAS_HEIGHT]]
     pts = np.append(pts, edge_pts)
     pts = np.reshape(pts, (MAX_POINTS + len(edge_pts), 2))
 
