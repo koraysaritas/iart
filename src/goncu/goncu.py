@@ -62,7 +62,7 @@ def draw_tiles(img, rect_tile_width, step_tile, step_in_tile):
 
 def roi_fill_color(img, roi, color):
     if roi:
-        img[roi[0][0]:roi[1][0], roi[0][1]:roi[1][1]] = color
+        img[int(roi[0][0]):int(roi[1][0]), int(roi[0][1]):int(roi[1][1])] = color
 
 
 if __name__ == '__main__':
