@@ -1,7 +1,6 @@
-# Pürtelaş
+# Aaahh!!! Real Monsters
 import numpy as np
 import cv2
-import random
 
 CANVAS_WIDTH = 600
 CANVAS_HEIGHT = 600
@@ -71,7 +70,7 @@ if __name__ == '__main__':
     draw_base(img, RECT_BASE_WIDTH)
     draw_tiles(img, RECT_TILE_WIDTH, STEP_TILE, STEP_IN_TILE)
 
-    cv2.imshow('purtelas', img)
-    cv2.imwrite('purtelas.png', img)
+    cv2.imshow('real_monsters', img)
+    cv2.imwrite('real_monsters.png', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
