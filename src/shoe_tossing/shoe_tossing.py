@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 from scipy.misc import comb
 import random
+from math import sqrt, exp
 
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 600
@@ -28,6 +29,16 @@ def gen_color(num, colors):
         arr_r = np.linspace(f[2], t[2], num)
         for b, g, r in zip(arr_b, arr_g, arr_r):
             yield (b, g, r)
+
+
+def calc_shoelaces_start(img, pt_wire_left, pt_wire_right):
+    d = sqrt((pt_wire_right[0] - pt_wire_left[0]) ** 2 + (pt_wire_right[1] - pt_wire_left[1]) ** 2)  # distance
+    n = np.random.randint(d)
+    r = n / d  # n pts away from wire_left
+    shoelaces_x = r * pt_wire_right[0] + (1 - r) * pt_wire_left[0]  # find point that divides the segment
+    shoelaces_y = r * pt_wire_right[1] + (1 - r) * pt_wire_left[1]  # into the ratio (1-r):r
+    img[shoelaces_y, shoelaces_x] = COLOR_WHITE_BGR
+    return shoelaces_x, shoelaces_y
 
 
 def bernstein_poly(i, n, t):
@@ -84,12 +95,31 @@ def draw_wire(img):
 
     cv2.line(img, pt1, pt2, COLOR_BLACK_WIRE, 2, lineType=cv2.LINE_AA)
 
+    return pt1, pt2
+
+
+def draw_shoes_right(img, pt_shoelaces_start):
+    pass
+
+
+def draw_shoes_left(img, pt_shoelaces_start):
+    pass
+
+
+def draw_shoes(img, pt_wire_left, pt_wire_right):
+    pt_shoelaces_start = calc_shoelaces_start(img, pt_wire_left, pt_wire_right)
+
+    draw_shoes_right(img, pt_shoelaces_start)
+    draw_shoes_left(img, pt_shoelaces_start)
+
 
 if __name__ == '__main__':
     img = create_canvas(CANVAS_HEIGHT, CANVAS_WIDTH, 0)
 
     draw_base(img)
-    draw_wire(img)
+    pt_wire_left, pt_wire_right = draw_wire(img)
+    draw_shoes(img, pt_wire_left, pt_wire_right)
+    # draw_shoelaces(img)
 
     cv2.imshow('shoe_tossing', img)
     cv2.imwrite('shoe_tossing.png', img)
