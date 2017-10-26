@@ -1,4 +1,4 @@
-# Piet Mondriaan
+# Piet Mondrian
 import numpy as np
 import cv2
 import random
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     color = random_color(BGR_R_LOWER, BGR_R_UPPER, 2)
     roi_fill_color(img, roi, color)
 
-    cv2.imshow('mondriaan', img)
-    cv2.imwrite('mondriaan.png', img)
+    cv2.imshow('mondrian', img)
+    cv2.imwrite('mondrian.png', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

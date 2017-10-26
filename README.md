@@ -1,8 +1,8 @@
 
 ## I, Art
 
-#### p. mondriaan
-![mondriaan](https://raw.githubusercontent.com/koraysaritas/iart/master/src/mondriaan/mondriaan.png)
+#### p. mondrian
+![mondrian](https://raw.githubusercontent.com/koraysaritas/iart/master/src/mondrian/mondrian.png)
 
 
 #### selina
